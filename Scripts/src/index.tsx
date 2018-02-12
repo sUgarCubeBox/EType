@@ -37,23 +37,23 @@ class TypingApp extends React.Component<{}, TypingAppState> {
         keyStream.subscribe(x => this.OnStateChanged());
         keyStream.connect();
 
-        this.state = {
-            left: this.processor.Left,
-            typed: this.processor.Typed,
-            mean: this.processor.NowTypingEntry.Mean,
-            correctCount: this.watcher.State.correctCount,
-            missCount: this.watcher.State.missCount
-        };        
+        this.state = this.NowState;
     }
 
     private OnStateChanged() {
-        this.setState({
+        this.setState(this.NowState);
+    }
+
+    private get NowState() : any {
+        return {
             left: this.processor.Left,
             typed: this.processor.Typed,
             mean: this.processor.NowTypingEntry.Mean,
             correctCount: this.watcher.State.correctCount,
-            missCount: this.watcher.State.missCount});
-    }
+            missCount: this.watcher.State.missCount,
+            maxSpeed: this.watcher.State.maxSpeed
+        };
+    }   
 
     render() {
         return (
@@ -62,7 +62,8 @@ class TypingApp extends React.Component<{}, TypingAppState> {
                 left={this.state.left}
                 missCount={this.state.missCount}
                 correctCount={this.state.correctCount}
-                typed={this.state.typed} />        
+                typed={this.state.typed} 
+                maxSpeed={this.state.maxSpeed} />        
         );
     }
 

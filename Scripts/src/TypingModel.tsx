@@ -2,6 +2,7 @@
 // for more information see the following page on the TypeScript wiki:
 // https://github.com/Microsoft/TypeScript/wiki/JSX
 
+import './SpanWindow';
 import { Queue } from 'typescript-collections';
 import { Observable, Subject } from 'rxjs/Rx';
 
@@ -146,6 +147,21 @@ export class Watcher {
         p.MissAsObservable().subscribe(x => state.missCount++);
         p.SkipAsObservable().subscribe(x => state.timeOverCount++);
         p.FinishAsObservable().subscribe(x => state.endTime = new Date(Date.now()));
+
+        console.log(p.CorrectAsObservable());
+
+        // calc max speed
+        p.CorrectAsObservable()
+         .map(x => Date.now())
+         .map(x => [x, x]) // diagonal map
+         .scan((prevPair, diagonalPair) => [prevPair[1], diagonalPair[0]] ,[0, 0])
+         .map(x => x[1] - x[0]) // time between keydowns
+         .spanWindow<number>(5) // buffering events by sliding window
+         .map(x => x.reduce((s, x) => s + x) / x.length) // window average
+         .scan((min, x) => x < min ? x : min, Number.MAX_VALUE)
+         .distinctUntilChanged()
+         .do(x => console.log(x))
+         .subscribe(x => state.maxSpeed = 1000 / new Date(x).getMilliseconds());         
     }
 }
 
