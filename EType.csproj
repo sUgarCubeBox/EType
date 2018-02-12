@@ -80,6 +80,7 @@
     <Folder Include="Scripts\dist\" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="Scripts\src\MenuView.tsx" />
     <TypeScriptCompile Include="Scripts\src\index.tsx" />
     <TypeScriptCompile Include="Scripts\src\SpanWindow.tsx" />
     <TypeScriptCompile Include="Scripts\src\TypingView.tsx" />
