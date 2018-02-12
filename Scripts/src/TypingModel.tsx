@@ -45,7 +45,6 @@ export class Processor {
             this.cursor++;
             this.correctTypeSubject.next({});
             if (this.IsEntered) {
-                console.log("next!")
                 this.NextWord();
             }
             return true;
