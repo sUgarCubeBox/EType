@@ -180,8 +180,7 @@ export class Watcher {
             .map(x => x.reduce((s, x) => s + x) / x.length) // window average
             .scan((min, x) => x < min ? x : min, Number.MAX_VALUE)
             .distinctUntilChanged()
-            .do(x => console.log(x))
-            .subscribe(x => state.maxSpeed = 1000 / new Date(x).getMilliseconds()); 
+            .subscribe(x => state.maxSpeed = 1000 / x); 
     }
 
     private BindMissTypedRecording(p: Processor, state: TypingState) {
