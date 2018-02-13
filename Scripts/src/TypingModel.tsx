@@ -61,21 +61,21 @@ export class Processor {
     }
 
     private NextWord() {
-        this.wordIndex++;
         if (this.IsFinished) {
             this.finishSubject.next({});
             return;
         }
+        this.wordIndex++;
         this.cursor = 0;
         this.nextWordSubject.next({});
     }
 
     private get IsEntered(): boolean {
-        return this.cursor <= this.CurrentWord.length;
+        return this.CurrentWord.length <= this.cursor;
     }
 
     private get IsFinished(): boolean {
-        return this.words.length <= this.wordIndex;
+        return this.words.length - 1 === this.wordIndex && this.IsEntered;
     }
 
     private get CurrentWord(): string {
@@ -187,6 +187,8 @@ export class Watcher {
     private BindMissTypedRecording(p: Processor, state: TypingState) {
         p.MissAsObservable()
             .map(x => [p.Cursor, p.WordIndex])
+            .do(x => console.log(x))
+            .do(x => console.log(state.missTypedMap[x[1]]))
             .subscribe(x => state.missTypedMap[x[1]][x[0]] += 1); // record misstyped position
     }
 }
@@ -202,12 +204,13 @@ class TypingState implements ITypingState {
     words: Entry[];
 
     constructor(words: Entry[]) {
-        this.missTypedMap = [];
-        this.words.map(x => x.Word).forEach(x => {
+        this.missTypedMap = Array<number[]>(words.length);
+        this.words = words;
+        this.words.map(x => x.Word).forEach((x,i) => {
             var t = new Array<number>(x.length);
-            for (var i = 0; i < x.length; i++) // init 2 dims array with 0.
-                t[i] = 0;
-            this.missTypedMap.push();
+            for (var j = 0; j < x.length; j++) // init 2 dims array with 0.
+                t[j] = 0;
+            this.missTypedMap[i] = t;
         });
     }
 }

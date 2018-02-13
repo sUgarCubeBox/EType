@@ -1,7 +1,8 @@
 ﻿import * as React from "react";
 import * as ReactDOM from "react-dom";
-import * as View from "./TypingView";
-import { Entry, Processor, Watcher } from "./TypingModel";
+import { TypingView, TypingViewProp } from "./TypingView";
+import { Entry, Processor, Watcher, ITypingState } from "./TypingModel";
+import { StartMenu, ResultMenu } from './MenuView'
 import * as Rx from "rxjs"
 
 const words: Entry[] = [
@@ -14,9 +15,14 @@ const words: Entry[] = [
     new Entry("time", "時間")
 ];
 
+enum Scene {
+    Start,
+    Game,
+    Result
+};
 
-interface TypingAppState extends View.TypingViewProp {
-    
+interface TypingAppState extends TypingViewProp {
+    scene: Scene;
 }
 
 class TypingApp extends React.Component<{}, TypingAppState> {
@@ -26,6 +32,26 @@ class TypingApp extends React.Component<{}, TypingAppState> {
 
     constructor(props: any) {
         super(props);
+        this.state = {
+            scene: Scene.Start,
+            left: "",
+            typed: "",
+            mean: "",
+            correctCount: 0,
+            missCount: 0,
+            maxSpeed: 0
+        };
+    }
+
+    private OnStartApp() {
+        this.setState({ scene: Scene.Start });
+    }
+
+    private OnResult(finalState: ITypingState) {
+        this.setState({ scene: Scene.Result });
+    }
+
+    private OnStartGame() {
         this.processor = new Processor(words);
         this.watcher = new Watcher(this.processor);
 
@@ -33,18 +59,22 @@ class TypingApp extends React.Component<{}, TypingAppState> {
         keyStream
             .map(x => x.key)
             .do(x => console.log(x))
-            .subscribe(x => this.processor.Enter(x)); 
-        keyStream.subscribe(x => this.OnStateChanged());
+            .subscribe(x => this.processor.Enter(x));
+        keyStream.subscribe(x => this.OnGameStateChanged());
         keyStream.connect();
 
-        this.state = this.NowState;
+        this.processor.FinishAsObservable().subscribe(_ => this.OnResult(this.watcher.State));
+
+        this.setState({ scene: Scene.Game });
+        this.processor.Start();
+        this.OnGameStateChanged();
     }
 
-    private OnStateChanged() {
-        this.setState(this.NowState);
+    private OnGameStateChanged() {
+        this.setState(this.GameState);
     }
 
-    private get NowState() : any {
+    private get GameState(): any {
         return {
             left: this.processor.Left,
             typed: this.processor.Typed,
@@ -53,18 +83,31 @@ class TypingApp extends React.Component<{}, TypingAppState> {
             missCount: this.watcher.State.missCount,
             maxSpeed: this.watcher.State.maxSpeed
         };
-    }   
+    }
 
     render() {
-        return (
-            <View.TypingView
-                mean={this.state.mean}
+        switch (this.state.scene) {
+            case Scene.Start: return <StartMenu onstart={this.OnStartGame.bind(this)} />;
+
+
+            case Scene.Game: return <TypingView
                 left={this.state.left}
-                missCount={this.state.missCount}
+                typed={this.state.typed}
                 correctCount={this.state.correctCount}
-                typed={this.state.typed} 
-                maxSpeed={this.state.maxSpeed} />        
-        );
+                maxSpeed={this.state.maxSpeed}
+                missCount={this.state.missCount}
+                mean={this.state.mean} />;
+
+
+            case Scene.Result: return <ResultMenu
+                finalState={this.watcher.State}
+                onRetry={this.OnStartGame.bind(this)}
+                onReturn={() => this.OnResult(this.watcher.State)}
+                onStudyMissedWord={() => { }} />;
+
+
+            default: return "";
+        }
     }
 
 }

@@ -92,15 +92,15 @@ interface MissTypedMapViewProp {
 
 /// ミスマップの結果表示
 class MissTypedMapView extends React.Component<MissTypedMapViewProp, {}>{
-    createRow(missTypedLine: number[], word: string) {
-        var row = missTypedLine.map((missCount, index) => 0 < missCount ? <span style={{ color: "red" }}>{word.charAt(index)}</span > : <span>{word.charAt(index)}</span>);
+    createRow(missTypedLine: number[], word: string, key: number) {
+        var row = missTypedLine.map((missCount, index) => 0 < missCount ? <span key={index} style={{ color: "red" }}>{word.charAt(index)}</span > : <span key={index}>{word.charAt(index)}</span>);
         return (
-            <p>{row}</p>
+            <p key={key}>{row}</p>
         );
     }
 
     createMap(missTypedMap: number[][], words: Entry[]) {
-        var table = missTypedMap.map((missTypedLine, index) => this.createRow(missTypedLine, words[index].Word));
+        var table = missTypedMap.map((missTypedLine, index) => this.createRow(missTypedLine, words[index].Word, index));
         return (
             <div>{table}</div>
         );
