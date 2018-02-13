@@ -26,9 +26,9 @@ export class StartMenu extends React.Component<StartMenuProp, {}> {
 
 interface ResultProp {
     finalState: ITypingState;
-    onReturn: () => void;
-    onRetry: () => void;
-    onStudyMissedWord: () => void;
+    onReturn: () => void; // タイトル画面へ
+    onRetry: () => void; // 再挑戦
+    onStudyMissedWord: () => void; // 誤った文字のみ挑戦
 };
 
 export class ResultMenu extends React.Component<ResultProp, {}> {
