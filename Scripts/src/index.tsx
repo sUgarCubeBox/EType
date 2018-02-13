@@ -28,6 +28,7 @@ interface TypingAppState extends TypingViewProp {
 class TypingApp extends React.Component<{}, TypingAppState> {
     private processor: Processor;
     private watcher: Watcher;
+    private missedWords: Entry[];
 
     constructor(props: any) {
         super(props);
@@ -51,8 +52,13 @@ class TypingApp extends React.Component<{}, TypingAppState> {
     }
 
     private OnStartGame() {
+        this.StartGame(words);
+    }
+
+    private StartGame(words: Entry[]) {
         this.processor = new Processor(words);
         this.watcher = new Watcher(this.processor);
+        this.missedWords = new Array<Entry>();
 
         var keyStream = Rx.Observable.fromEvent<KeyboardEvent>(document, 'keydown').publish();
         keyStream
@@ -61,14 +67,29 @@ class TypingApp extends React.Component<{}, TypingAppState> {
         keyStream.subscribe(x => this.OnGameStateChanged());
         var keyStreamConnection = keyStream.connect();
 
+        var missWordStream = this.processor.MissAsObservable()
+            .map(x => this.processor.NowTypingEntry)
+            .distinctUntilChanged()
+            .subscribe(x => this.missedWords.push(x));
+
         this.processor.FinishAsObservable().take(1).subscribe(_ => {
             keyStreamConnection.unsubscribe();
+            missWordStream.unsubscribe();
             this.OnResult(this.watcher.State);
         });
 
         this.setState({ scene: Scene.Game });
         this.processor.Start();
         this.OnGameStateChanged();
+    }
+
+    private OnStartGameWithMissedTypedWords() {
+        if (0 < this.missedWords.length) {
+            this.StartGame(this.missedWords);
+        }
+        else {
+            this.OnStartApp();
+        }
     }
 
     private OnGameStateChanged() {
@@ -104,7 +125,7 @@ class TypingApp extends React.Component<{}, TypingAppState> {
                 finalState={this.watcher.State}
                 onRetry={() => this.OnStartGame()}
                 onReturn={() => this.OnStartApp()}
-                onStudyMissedWord={() => { }} />;
+                onStudyMissedWord={() => this.OnStartGameWithMissedTypedWords()} />;
 
 
             default: return "";

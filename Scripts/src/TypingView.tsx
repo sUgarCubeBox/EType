@@ -1,24 +1,26 @@
 ﻿import * as React from 'react';
-import { Well, Panel } from 'react-bootstrap';
+import { Well, Panel, Grid, Row } from 'react-bootstrap';
 
 export interface TypingViewProp extends WordViewProp, MeanViewProp {
     correctCount: number;
     missCount: number;
-    maxSpeed: number;    
+    maxSpeed: number;
 }
 
 export class TypingView extends React.Component<TypingViewProp, {}> {
     render() {
         return (
-            <div>
-                <p>タイプ数 : {this.props.correctCount} ミス数 : {this.props.missCount} 最高タイピング速度 : {this.props.maxSpeed.toFixed(1)}(type/s) </p>
-                <Panel>
-                    <Panel.Body>
-                        <MeanView mean={this.props.mean} />
-                        <WordView typed={this.props.typed} left={this.props.left} />
-                    </Panel.Body>
-                </Panel>
-            </div>
+            <Grid>
+                <Row>
+                    <p>タイプ数 : {this.props.correctCount} ミス数 : {this.props.missCount} 最高タイピング速度 : {this.props.maxSpeed.toFixed(1)}(type/s) </p>
+                    <Panel>
+                        <Panel.Body>
+                            <MeanView mean={this.props.mean} />
+                            <WordView typed={this.props.typed} left={this.props.left} />
+                        </Panel.Body>
+                    </Panel>
+                </Row>
+            </Grid>
         );
     }
 }

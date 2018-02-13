@@ -13,11 +13,13 @@ interface StartMenuProp {
 export class StartMenu extends React.Component<StartMenuProp, {}> {
     render() {
         return (
-            <div>
-                <h1>Etype</h1>
-                <p>英単語のタイピングとその単語の意味も学べます。</p>
-                <Button onClick={() => this.props.onstart()}>Start</Button>
-            </div>
+            <Grid>
+                <Row>
+                    <h1>Etype</h1>
+                    <p>英単語のタイピングとその単語の意味も学べます。</p>
+                    <Button onClick={() => this.props.onstart()}>Start</Button>
+                </Row>
+            </Grid>
         );
     }
 }
@@ -34,14 +36,14 @@ export class ResultMenu extends React.Component<ResultProp, {}> {
         return (
             <Grid>
                 <Row>
-                    <Col>
+                    <Col xs={4}>
                         <h1>リザルト</h1>
                         <ValueResultView finalState={this.props.finalState} />
                         <Button onClick={() => this.props.onReturn()}>タイトルへ</Button>
                         <Button onClick={() => this.props.onRetry()}>再挑戦</Button>
-                        <Button onClick={() => this.props.onStudyMissedWord()}>間違った単語のみ挑戦</Button>
+                        <Button disabled={0 === this.props.finalState.missCount} onClick={() => this.props.onStudyMissedWord()}>間違った単語のみ挑戦</Button>
                     </Col>
-                    <Col>
+                    <Col xs={8}>
                         <h1>ミスタイプした場所</h1>
                         <MissTypedMapView missTypedMap={this.props.finalState.missTypedMap} words={this.props.finalState.words} />
                     </Col>
@@ -71,7 +73,7 @@ class ValueResultView extends React.Component<ValueResultProp, {}> {
     render() {
         // スコアなどの集計をするオブジェクト
         var aggregater = new TypingStateAggregater(this.props.finalState);
-    
+
         return (
             <div>
                 <p>スコア : {aggregater.CalcScore().toFixed(0)}</p>
