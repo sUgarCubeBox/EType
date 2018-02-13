@@ -7,9 +7,9 @@ import { Queue } from 'typescript-collections';
 import { Observable, Subject } from 'rxjs/Rx';
 
 export class Processor {
-    private words: Array<Entry>; // immutable
-    private wordIndex: number; // state
-    private cursor: number; // state
+    private words: Array<Entry>; 
+    private wordIndex: number; 
+    private cursor: number; 
 
     // subjects
     private missTypeSubject = new Subject<{}>();
