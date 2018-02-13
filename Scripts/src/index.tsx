@@ -88,7 +88,7 @@ class TypingApp extends React.Component<{}, TypingAppState> {
 
     render() {
         switch (this.state.scene) {
-            case Scene.Start: return <StartMenu onstart={this.OnStartGame.bind(this)} />;
+            case Scene.Start: return <StartMenu onstart={() => this.OnStartGame()} />;
 
 
             case Scene.Game: return <TypingView
@@ -102,8 +102,8 @@ class TypingApp extends React.Component<{}, TypingAppState> {
 
             case Scene.Result: return <ResultMenu
                 finalState={this.watcher.State}
-                onRetry={this.OnStartGame.bind(this)}
-                onReturn={() => this.OnResult(this.watcher.State)}
+                onRetry={() => this.OnStartGame()}
+                onReturn={() => this.OnStartApp()}
                 onStudyMissedWord={() => { }} />;
 
 

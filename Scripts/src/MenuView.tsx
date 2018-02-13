@@ -16,7 +16,7 @@ export class StartMenu extends React.Component<StartMenuProp, {}> {
             <div>
                 <h1>Etype</h1>
                 <p>英単語のタイピングとその単語の意味も学べます。</p>
-                <Button onClick={this.props.onstart.bind(this)}>Start</Button>
+                <Button onClick={() => this.props.onstart()}>Start</Button>
             </div>
         );
     }
@@ -37,9 +37,9 @@ export class ResultMenu extends React.Component<ResultProp, {}> {
                     <Col>
                         <h1>リザルト</h1>
                         <ValueResultView finalState={this.props.finalState} />
-                        <Button onClick={this.props.onReturn.bind(this)}>タイトルへ</Button>
-                        <Button onClick={this.props.onRetry.bind(this)}>再挑戦</Button>
-                        <Button onClick={this.props.onStudyMissedWord.bind(this)}>間違った単語のみ挑戦</Button>
+                        <Button onClick={() => this.props.onReturn()}>タイトルへ</Button>
+                        <Button onClick={() => this.props.onRetry()}>再挑戦</Button>
+                        <Button onClick={() => this.props.onStudyMissedWord()}>間違った単語のみ挑戦</Button>
                     </Col>
                     <Col>
                         <h1>ミスタイプした場所</h1>
