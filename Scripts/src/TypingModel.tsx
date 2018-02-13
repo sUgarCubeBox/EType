@@ -36,6 +36,16 @@ export class Processor {
         this.cursor = 0;
         this.wordIndex = 0;
         this.startSubject.next({});
+        this.FinishAsObservable().subscribe(x => this.OnFinish());
+    }
+
+    private OnFinish() {
+        [this.missTypeSubject,
+        this.correctTypeSubject,
+        this.nextWordSubject,
+        this.finishSubject,
+        this.startSubject,
+        this.skipSubject].forEach(x => x.complete()); // dispose observation
     }
 
     /// return true when typed letter is correct.
@@ -166,7 +176,7 @@ export class Watcher {
         p.SkipAsObservable().subscribe(x => state.timeOverCount++);
         p.FinishAsObservable().subscribe(x => state.endTime = new Date(Date.now()));
         p.StartAsObservable().subscribe(x => this.BindMaxSpeedCalculation(p, state));
-        p.StartAsObservable().subscribe(x => this.BindMissTypedRecording(p, state));        
+        p.StartAsObservable().subscribe(x => this.BindMissTypedRecording(p, state));
     }
 
     private BindMaxSpeedCalculation(p: Processor, state: TypingState) {
@@ -180,14 +190,12 @@ export class Watcher {
             .map(x => x.reduce((s, x) => s + x) / x.length) // window average
             .scan((min, x) => x < min ? x : min, Number.MAX_VALUE)
             .distinctUntilChanged()
-            .subscribe(x => state.maxSpeed = 1000 / x); 
+            .subscribe(x => state.maxSpeed = 1000 / x);
     }
 
     private BindMissTypedRecording(p: Processor, state: TypingState) {
         p.MissAsObservable()
             .map(x => [p.Cursor, p.WordIndex])
-            .do(x => console.log(x))
-            .do(x => console.log(state.missTypedMap[x[1]]))
             .subscribe(x => state.missTypedMap[x[1]][x[0]] += 1); // record misstyped position
     }
 }
@@ -205,7 +213,7 @@ class TypingState implements ITypingState {
     constructor(words: Entry[]) {
         this.missTypedMap = Array<number[]>(words.length);
         this.words = words;
-        this.words.map(x => x.Word).forEach((x,i) => {
+        this.words.map(x => x.Word).forEach((x, i) => {
             var t = new Array<number>(x.length);
             for (var j = 0; j < x.length; j++) // init 2 dims array with 0.
                 t[j] = 0;
@@ -225,7 +233,7 @@ class Rank {
 
 /// スコアとかを集計する
 export class TypingStateAggregater {
-    private state: ITypingState;   
+    private state: ITypingState;
 
     constructor(state: ITypingState) {
         this.state = state;
@@ -233,32 +241,39 @@ export class TypingStateAggregater {
 
     public get State(): ITypingState { return this.state };
 
-    public CalcSpan(): Date {
+    public CalcSpanMilliseconds(): number {
         var startTime = this.state.startTime.getTime();
         var endTime = this.state.endTime.getTime();
-        return new Date(endTime - startTime);
+
+        return endTime - startTime;
+    }
+
+    public CalcSpanDate(): Date {
+        var ret = new Date();
+        ret.setTime((this.CalcSpanMilliseconds()) + (ret.getTimezoneOffset() * 60 * 1000));
+        return ret;
     }
 
     public CalcWPM(): number {
-        var spanTimeOfMinutes = this.CalcSpan().getTime() / (1000 * 60);
+        var spanTimeOfMinutes = this.CalcSpanMilliseconds() / (1000 * 60);
         var typed = this.state.correctCount;
 
         // [minute] = [millisecond] / (1000 * 60);
         return typed / spanTimeOfMinutes;
     };
 
-    public CalcScore(): number{
+    public CalcScore(): number {
         return this.CalcWPM() + this.state.maxSpeed * 1 - this.state.missCount * 5;
     }
 
     public CalcRank(): string {
         var score = this.CalcScore();
         var map: Rank[] = [
-            new Rank(550, "神タイパー"),
-            new Rank(400, "トップタイパー"),
-            new Rank(300, "メジャータイパー"),
+            new Rank(100, "タイパー研究生"),
             new Rank(200, "デビュータイパー"),
-            new Rank(100, "タイパー研究生")
+            new Rank(300, "メジャータイパー"),
+            new Rank(400, "トップタイパー"),
+            new Rank(550, "神タイパー")
         ];
 
         var rank = "ゲスト";

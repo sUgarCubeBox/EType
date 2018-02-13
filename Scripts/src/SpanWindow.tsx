@@ -10,7 +10,6 @@ Observable.prototype.spanWindow = function <T>(size: number) {
         var windowQueue = new Queue<T>();
         var windowObserver = {
             next: (x : T) => {
-                console.log(x);
                 windowQueue.enqueue(x);
                 if(size < windowQueue.size()){
                     windowQueue.dequeue();

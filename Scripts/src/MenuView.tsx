@@ -74,12 +74,12 @@ class ValueResultView extends React.Component<ValueResultProp, {}> {
     
         return (
             <div>
-                <p>スコア : {aggregater.CalcScore()}</p>
+                <p>スコア : {aggregater.CalcScore().toFixed(0)}</p>
                 <p>ランク : {aggregater.CalcRank()}</p>
                 <p>タイプ数 : {this.props.finalState.correctCount}</p>
                 <p>ミス数 : {this.props.finalState.missCount}</p>
                 <p>WPM : {aggregater.CalcWPM().toFixed(0)}</p>
-                <p>時間 : {this.timeStringify(aggregater.CalcSpan())}</p>
+                <p>時間 : {this.timeStringify(aggregater.CalcSpanDate())}</p>
                 <p>最高瞬間タイピング速度 : {this.props.finalState.maxSpeed.toFixed(1) + "(タイプ/秒)"}</p>
             </div>);
     }

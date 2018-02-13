@@ -28,7 +28,6 @@ interface TypingAppState extends TypingViewProp {
 class TypingApp extends React.Component<{}, TypingAppState> {
     private processor: Processor;
     private watcher: Watcher;
-    private typingStream: Rx.Subscription;
 
     constructor(props: any) {
         super(props);
@@ -58,12 +57,14 @@ class TypingApp extends React.Component<{}, TypingAppState> {
         var keyStream = Rx.Observable.fromEvent<KeyboardEvent>(document, 'keydown').publish();
         keyStream
             .map(x => x.key)
-            .do(x => console.log(x))
             .subscribe(x => this.processor.Enter(x));
         keyStream.subscribe(x => this.OnGameStateChanged());
-        keyStream.connect();
+        var keyStreamConnection = keyStream.connect();
 
-        this.processor.FinishAsObservable().subscribe(_ => this.OnResult(this.watcher.State));
+        this.processor.FinishAsObservable().take(1).subscribe(_ => {
+            keyStreamConnection.unsubscribe();
+            this.OnResult(this.watcher.State);
+        });
 
         this.setState({ scene: Scene.Game });
         this.processor.Start();
