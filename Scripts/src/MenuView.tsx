@@ -120,7 +120,7 @@ interface DifficultySelectViewProp {
     onSelect: (option: IDifficultyOption) => void;
 }
 
-export class DifficultySelectView extends React.Component<DifficultySelectViewProp, {}>{
+export class DifficultySelectMenu extends React.Component<DifficultySelectViewProp, {}>{
     handleSelect(option: IDifficultyOption) {
         this.props.onSelect(option);
     }

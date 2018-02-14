@@ -2,7 +2,7 @@
 import * as ReactDOM from "react-dom";
 import { TypingView, TypingViewProp } from "./TypingView";
 import { Entry, Processor, Watcher, ITypingState, WordsRequestClient, IDifficultyOption } from "./TypingModel";
-import { StartMenu, ResultMenu, DifficultySelectView } from './MenuView'
+import { StartMenu, ResultMenu, DifficultySelectMenu } from './MenuView'
 import * as Rx from "rxjs"
 
 enum Scene {
@@ -91,7 +91,7 @@ class TypingApp extends React.Component<{}, TypingAppState> {
             case Scene.Start: return <StartMenu onstart={() => this.OnSelectDifficulty()} />;
 
 
-            case Scene.SelectDifficulty: return <DifficultySelectView
+            case Scene.SelectDifficulty: return <DifficultySelectMenu
                 options={this.GetOptions()}
                 onSelect={(option) => this.OnSelectedDifficulty(option)} />
 
