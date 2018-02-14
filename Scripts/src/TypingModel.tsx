@@ -145,6 +145,9 @@ export class Entry {
 }
 
 export interface ITypingState {
+    readonly left: string;
+    readonly typed: string;
+    readonly mean: string;
     readonly missCount: number;
     readonly correctCount: number;
     readonly timeOverCount: number;
@@ -171,6 +174,13 @@ export class Watcher {
 
     private Bind(p: Processor, state: TypingState) {
         // start
+
+        p.StartAsObservable().merge(p.NextWordAsObservable(), p.CorrectAsObservable()).subscribe(_ => {
+            state.typed = p.Typed;
+            state.left = p.Left;
+            state.mean = p.NowTypingEntry.Mean;
+        });
+
         p.StartAsObservable().subscribe(x => state.startTime = new Date(Date.now()));
         p.CorrectAsObservable().subscribe(x => state.correctCount++);
         p.MissAsObservable().subscribe(x => state.missCount++);
@@ -207,6 +217,9 @@ export class Watcher {
 }
 
 class TypingState implements ITypingState {
+    left: string;
+    typed: string;
+    mean: string;
     missCount: number = 0;
     correctCount: number = 0;
     timeOverCount: number = 0;
