@@ -7,9 +7,9 @@ import { Queue } from 'typescript-collections';
 import { Observable, Subject } from 'rxjs/Rx';
 
 export class Processor {
-    private words: Array<Entry>; 
-    private wordIndex: number; 
-    private cursor: number; 
+    private words: Array<Entry>;
+    private wordIndex: number;
+    private cursor: number;
 
     // subjects
     private missTypeSubject = new Subject<{}>();
@@ -291,5 +291,61 @@ export class TypingStateAggregater {
         });
 
         return rank;
+    }
+}
+
+export interface IDifficultyOption {
+    readonly name: string;
+    readonly size: number;
+    readonly averageLength: number;
+    readonly discription: string;
+    readonly requestEndpoint: string;
+}
+
+class DifficultyOption implements IDifficultyOption {
+    public name: string;
+    public size: number; // size of the word set in this difficulty option
+    public averageLength: number; // average length of letters of words in this difficulty option
+    public discription: string;
+    public requestEndpoint: string;
+
+    constructor(name: string, size: number, averageLength: number, discription: string, endpoint: string) {
+        this.name = name;
+        this.size = size;
+        this.averageLength = averageLength;
+        this.discription = discription;
+        this.requestEndpoint = endpoint;
+    }
+}
+
+export class WordsRequestClient {
+    private apihost: string;
+
+    constructor(apihost: string) {
+        this.apihost = apihost;
+    }
+
+    public RequestOptions(): IDifficultyOption[] {
+        // test object
+        return [
+            new DifficultyOption("テストデータ", 7, 6, "テストのデータ", "/test"),
+            new DifficultyOption("テストデータ2", 7, 6, "テスト2のデータ", "/test"),
+        ];
+    }
+
+    public RuquestWords(endpoint: string): Entry[] {
+        // test words
+        switch (endpoint) {
+            case "/test": return [
+                new Entry("apple", "りんご"),
+                new Entry("programming", "プログラミング"),
+                new Entry("note", "メモ帳"),
+                new Entry("terminal", "端末"),
+                new Entry("extra", "余計な"),
+                new Entry("clock", "時計"),
+                new Entry("time", "時間")
+            ];
+            default: return [];
+        }
     }
 }

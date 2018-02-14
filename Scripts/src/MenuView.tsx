@@ -3,8 +3,8 @@
 // https://github.com/Microsoft/TypeScript/wiki/JSX
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Button, Well, Grid, Col, Row } from 'react-bootstrap';
-import { ITypingState, Entry, TypingStateAggregater } from './TypingModel';
+import { Button, Well, Grid, Col, Row, Panel, PanelBody } from 'react-bootstrap';
+import { ITypingState, Entry, TypingStateAggregater, IDifficultyOption } from './TypingModel';
 
 interface StartMenuProp {
     onstart: () => void; // スタートボタンが押された時に呼ばれる
@@ -111,6 +111,54 @@ class MissTypedMapView extends React.Component<MissTypedMapViewProp, {}>{
     render() {
         return (
             <Well>{this.createMap(this.props.missTypedMap, this.props.words)}</Well>
+        );
+    }
+}
+
+interface DifficultySelectViewProp {
+    options: IDifficultyOption[];
+    onSelect: (option: IDifficultyOption) => void;
+}
+
+export class DifficultySelectView extends React.Component<DifficultySelectViewProp, {}>{
+    handleSelect(option: IDifficultyOption) {
+        this.props.onSelect(option);
+    }
+
+    render() {
+        var options = this.props.options.map((o, i) =>
+            <Panel key={i}>
+                <DifficultyOptionView info={o} onClick={(option: IDifficultyOption) => this.handleSelect(option)} />
+            </Panel>);
+
+        return (<Grid>
+            <Row>
+                <h1>難易度セレクト</h1>
+                <p>プレイ難易度を選択してください。</p>
+            </Row>
+            {options}
+        </Grid>);
+    }
+}
+
+interface DifficultyOptionViewProp {
+    info: IDifficultyOption,
+    onClick: (option: IDifficultyOption) => void
+}
+
+class DifficultyOptionView extends React.Component<DifficultyOptionViewProp, {}>{
+    handleSelect() {
+        this.props.onClick(this.props.info);
+    }
+
+    render() {
+        return (
+            <div onClick={() => this.handleSelect()}>
+                <h2>{this.props.info.name}</h2>
+                <p>ワード数 : {this.props.info.size} 平均文字数 : {this.props.info.averageLength}</p>
+                <hr />
+                <p>{this.props.info.discription}</p>
+            </div>
         );
     }
 }

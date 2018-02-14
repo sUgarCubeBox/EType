@@ -1,22 +1,13 @@
 ﻿import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { TypingView, TypingViewProp } from "./TypingView";
-import { Entry, Processor, Watcher, ITypingState } from "./TypingModel";
-import { StartMenu, ResultMenu } from './MenuView'
+import { Entry, Processor, Watcher, ITypingState, WordsRequestClient, IDifficultyOption } from "./TypingModel";
+import { StartMenu, ResultMenu, DifficultySelectView } from './MenuView'
 import * as Rx from "rxjs"
-
-const words: Entry[] = [
-    new Entry("apple", "りんご"),
-    new Entry("programming", "プログラミング"),
-    new Entry("note", "メモ帳"),
-    new Entry("terminal", "端末"),
-    new Entry("extra", "余計な"),
-    new Entry("clock", "時計"),
-    new Entry("time", "時間")
-];
 
 enum Scene {
     Start,
+    SelectDifficulty,
     Game,
     Result
 };
@@ -51,11 +42,20 @@ class TypingApp extends React.Component<{}, TypingAppState> {
         this.setState({ scene: Scene.Result });
     }
 
-    private OnStartGame() {
-        this.StartGame(words);
+    private OnSelectDifficulty() {
+        this.setState({ scene: Scene.SelectDifficulty });
     }
 
-    private StartGame(words: Entry[]) {
+    private GetOptions(): IDifficultyOption[]{
+        return new WordsRequestClient("/test").RequestOptions();
+    }
+
+    private OnSelectedDifficulty(option: IDifficultyOption) {
+        var words = new WordsRequestClient("/test").RuquestWords(option.requestEndpoint);
+        this.OnStartGame(words);
+    }
+
+    private OnStartGame(words: Entry[]) {
         this.processor = new Processor(words);
         this.watcher = new Watcher(this.processor);
         this.missedWords = new Array<Entry>();
@@ -80,7 +80,7 @@ class TypingApp extends React.Component<{}, TypingAppState> {
 
     private OnStartGameWithMissedTypedWords() {
         if (0 < this.missedWords.length) {
-            this.StartGame(this.missedWords);
+            this.OnStartGame(this.missedWords);
         }
         else {
             this.OnStartApp();
@@ -104,7 +104,12 @@ class TypingApp extends React.Component<{}, TypingAppState> {
 
     render() {
         switch (this.state.scene) {
-            case Scene.Start: return <StartMenu onstart={() => this.OnStartGame()} />;
+            case Scene.Start: return <StartMenu onstart={() => this.OnSelectDifficulty()} />;
+
+
+            case Scene.SelectDifficulty: return <DifficultySelectView
+                options={this.GetOptions()}
+                onSelect={(option) => this.OnSelectedDifficulty(option)} />
 
 
             case Scene.Game: return <TypingView
@@ -118,7 +123,7 @@ class TypingApp extends React.Component<{}, TypingAppState> {
 
             case Scene.Result: return <ResultMenu
                 finalState={this.watcher.State}
-                onRetry={() => this.OnStartGame()}
+                onRetry={() => this.OnStartGame(this.watcher.State.words)}
                 onReturn={() => this.OnStartApp()}
                 onStudyMissedWord={() => this.OnStartGameWithMissedTypedWords()} />;
 
