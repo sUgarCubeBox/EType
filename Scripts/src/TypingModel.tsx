@@ -165,6 +165,17 @@ export class Watcher {
 
     public get State(): ITypingState { return this.state; }
 
+    public StateChangeAsObservable() {
+        var p = this.processor;
+        return p.StartAsObservable()
+            .merge(p.CorrectAsObservable(),
+            p.MissAsObservable(),
+            p.NextWordAsObservable(),
+            p.FinishAsObservable(),
+            p.SkipAsObservable())
+            .map(_ => this.State);
+    }
+
     constructor(processor: Processor) {
         this.processor = processor;
         var state = new TypingState(this.processor.Words);

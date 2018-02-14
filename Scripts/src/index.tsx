@@ -52,16 +52,16 @@ class TypingApp extends React.Component<{}, TypingAppState> {
         var watcher = new Watcher(processor); // manager that observe state of the processor and aggregate it.
 
         /// bind keyboard events to typing game processor
-        var keyStream = Rx.Observable.fromEvent<KeyboardEvent>(document, 'keydown').publish();
-        keyStream
+        var keyStream = Rx.Observable.fromEvent<KeyboardEvent>(document, 'keydown')
             .map(x => x.key)
             .subscribe(x => processor.Enter(x));
-        keyStream.subscribe(x => this.OnGameStateChanged(watcher.State));
-        var keyStreamConnection = keyStream.connect();
+
+        /// bind state events to typing game view
+        watcher.StateChangeAsObservable().subscribe(x => this.OnGameStateChanged(x));
 
         /// bind game finish events to result view
         processor.FinishAsObservable().take(1).subscribe(_ => {
-            keyStreamConnection.unsubscribe();
+            keyStream.unsubscribe();
             this.OnResult(watcher.State); /// when finish game, app transit to result scene.
         });
 
@@ -74,7 +74,7 @@ class TypingApp extends React.Component<{}, TypingAppState> {
     private OnStartGameWithMissedTypedWords() {
         var missedWords = this.state.typingState.missedWords;
 
-        if (0 < missedWords.length) { 
+        if (0 < missedWords.length) {
             this.OnStartGame(missedWords);
         }
         else {
