@@ -67,14 +67,9 @@ class TypingApp extends React.Component<{}, TypingAppState> {
         keyStream.subscribe(x => this.OnGameStateChanged());
         var keyStreamConnection = keyStream.connect();
 
-        var missWordStream = this.processor.MissAsObservable()
-            .map(x => this.processor.NowTypingEntry)
-            .distinctUntilChanged()
-            .subscribe(x => this.missedWords.push(x));
-
         this.processor.FinishAsObservable().take(1).subscribe(_ => {
+            this.missedWords = this.watcher.State.missedWords;
             keyStreamConnection.unsubscribe();
-            missWordStream.unsubscribe();
             this.OnResult(this.watcher.State);
         });
 

@@ -153,6 +153,7 @@ export interface ITypingState {
     readonly maxSpeed: number;
     readonly missTypedMap: number[][];
     readonly words: Entry[];
+    readonly missedWords: Entry[];
 }
 
 export class Watcher {
@@ -195,6 +196,11 @@ export class Watcher {
 
     private BindMissTypedRecording(p: Processor, state: TypingState) {
         p.MissAsObservable()
+            .map(_ => p.NowTypingEntry)
+            .distinctUntilChanged()
+            .subscribe(x => state.missedWords.push(x));
+
+        p.MissAsObservable()
             .map(x => [p.Cursor, p.WordIndex])
             .subscribe(x => state.missTypedMap[x[1]][x[0]] += 1); // record misstyped position
     }
@@ -209,9 +215,11 @@ class TypingState implements ITypingState {
     maxSpeed: number = 0;
     missTypedMap: number[][];
     words: Entry[];
+    missedWords: Entry[];
 
     constructor(words: Entry[]) {
         this.missTypedMap = Array<number[]>(words.length);
+        this.missedWords = Array<Entry>();
         this.words = words;
         this.words.map(x => x.Word).forEach((x, i) => {
             var t = new Array<number>(x.length);
