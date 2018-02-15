@@ -60,8 +60,9 @@ class TypingApp extends React.Component<{}, TypingAppState> {
         watcher.StateChangeAsObservable().subscribe(x => this.OnGameStateChanged(x));
 
         /// bind game finish events to result view
-        processor.FinishAsObservable().take(1).subscribe(_ => {
+        watcher.FinishAsObservable().take(1).subscribe(_ => {
             keyStream.unsubscribe();
+            processor.Close();
             this.OnResult(watcher.State); /// when finish game, app transit to result scene.
         });
 

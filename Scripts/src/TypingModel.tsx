@@ -39,11 +39,14 @@ export class Processor {
         this.FinishAsObservable().subscribe(x => this.OnFinish());
     }
 
+    public Close() {
+        this.finishSubject.complete();
+    }
+
     private OnFinish() {
         [this.missTypeSubject,
         this.correctTypeSubject,
         this.nextWordSubject,
-        this.finishSubject,
         this.startSubject,
         this.skipSubject].forEach(x => x.complete()); // dispose observation
     }
@@ -163,6 +166,10 @@ export class Watcher {
     private processor: Processor;
     private state: TypingState;
 
+    private finishSubject = new Subject<{}>();
+
+    public FinishAsObservable(): Observable<{}> { return this.finishSubject; }
+
     public get State(): ITypingState { return this.state; }
 
     public StateChangeAsObservable() {
@@ -196,7 +203,10 @@ export class Watcher {
         p.CorrectAsObservable().subscribe(x => state.correctCount++);
         p.MissAsObservable().subscribe(x => state.missCount++);
         p.SkipAsObservable().subscribe(x => state.timeOverCount++);
-        p.FinishAsObservable().subscribe(x => state.endTime = new Date(Date.now()));
+        p.FinishAsObservable().subscribe(x => {
+            state.endTime = new Date(Date.now())
+            this.finishSubject.next({});
+        });
         p.StartAsObservable().subscribe(x => this.BindMaxSpeedCalculation(p, state));
         p.StartAsObservable().subscribe(x => this.BindMissTypedRecording(p, state));
     }
