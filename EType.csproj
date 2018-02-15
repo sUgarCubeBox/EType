@@ -83,6 +83,7 @@
     <TypeScriptCompile Include="Scripts\src\MenuView.tsx" />
     <TypeScriptCompile Include="Scripts\src\index.tsx" />
     <TypeScriptCompile Include="Scripts\src\SpanWindow.tsx" />
+    <TypeScriptCompile Include="Scripts\src\test\test.tsx" />
     <TypeScriptCompile Include="Scripts\src\TypingView.tsx" />
     <TypeScriptCompile Include="Scripts\src\TypingModel.tsx" />
   </ItemGroup>
