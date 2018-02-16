@@ -185,20 +185,18 @@ export class Watcher {
 
     constructor(processor: Processor) {
         this.processor = processor;
-        var state = new TypingState(this.processor.Words);
+        var state = new TypingState(
+            this.processor.Words,
+            () => this.processor.Left,
+            () => this.processor.Typed,
+            () => this.processor.NowTypingEntry.Mean
+        );
         this.state = state;
         this.Bind(this.processor, this.state);
     }
 
     private Bind(p: Processor, state: TypingState) {
         // start
-
-        p.StartAsObservable().merge(p.NextWordAsObservable(), p.CorrectAsObservable()).subscribe(_ => {
-            state.typed = p.Typed;
-            state.left = p.Left;
-            state.mean = p.NowTypingEntry.Mean;
-        });
-
         p.StartAsObservable().subscribe(x => state.startTime = new Date(Date.now()));
         p.CorrectAsObservable().subscribe(x => state.correctCount++);
         p.MissAsObservable().subscribe(x => state.missCount++);
@@ -238,9 +236,6 @@ export class Watcher {
 }
 
 class TypingState implements ITypingState {
-    left: string;
-    typed: string;
-    mean: string;
     missCount: number = 0;
     correctCount: number = 0;
     timeOverCount: number = 0;
@@ -251,7 +246,21 @@ class TypingState implements ITypingState {
     words: Entry[];
     missedWords: Entry[];
 
-    constructor(words: Entry[]) {
+    private leftSelector: () => string;
+    private typedSelector: () => string;
+    private meanSelector: () => string;
+
+    get left(): string {
+        return this.leftSelector();
+    }
+    get typed(): string {
+        return this.typedSelector();
+    }
+    get mean(): string {
+        return this.meanSelector();
+    }
+
+    constructor(words: Entry[], leftSelector: () => string, typedSelecor: () => string, meanSelector: () => string) {
         this.missTypedMap = Array<number[]>(words.length);
         this.missedWords = Array<Entry>();
         this.words = words;
