@@ -270,6 +270,10 @@ class TypingState implements ITypingState {
                 t[j] = 0;
             this.missTypedMap[i] = t;
         });
+
+        this.leftSelector = leftSelector;
+        this.typedSelector = typedSelecor;
+        this.meanSelector = meanSelector;
     }
 }
 
