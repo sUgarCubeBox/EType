@@ -52,3 +52,27 @@ class MeanView extends React.Component<MeanViewProp, {}>{
         );
     }
 }
+
+interface CountDownViewProp {
+    count: number;
+    finish: boolean;
+}
+
+export class CountDownView extends React.Component<CountDownViewProp> {
+    countString(): string {
+        return this.props.finish ? "スタート" : this.props.count.toString();
+    }
+
+    render() {
+        return (
+            <Grid>
+                <Row>
+                    <Panel>
+                        <Panel.Body style={{ textAlign: "center" }}>
+                            <p style={{ color: "orange" }}>{this.countString()}</p>
+                        </Panel.Body>
+                    </Panel>
+                </Row>
+            </Grid>);
+    }
+}

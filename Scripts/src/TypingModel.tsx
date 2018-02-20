@@ -10,6 +10,7 @@ export class Processor {
     private words: Array<Entry>;
     private wordIndex: number;
     private cursor: number;
+    private isStarted: boolean;
 
     // subjects
     private missTypeSubject = new Subject<{}>();
@@ -30,6 +31,7 @@ export class Processor {
         this.cursor = 0;
         this.words = words;
         this.wordIndex = 0;
+        this.isStarted = false;
     }
 
     public Start() {
@@ -37,6 +39,7 @@ export class Processor {
         this.wordIndex = 0;
         this.startSubject.next({});
         this.FinishAsObservable().subscribe(x => this.OnFinish());
+        this.isStarted = true;
     }
 
     public Close() {
@@ -53,6 +56,9 @@ export class Processor {
 
     /// return true when typed letter is correct.
     public Enter(letter: string): boolean {
+        if (!this.isStarted)
+            return false;
+
         var currentLetter: string = this.CurrentLetter;
         if (letter === currentLetter) {
             this.cursor++;

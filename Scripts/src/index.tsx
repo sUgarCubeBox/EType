@@ -1,6 +1,6 @@
 ﻿import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { TypingView, TypingViewProp } from "./TypingView";
+import { TypingView, TypingViewProp, CountDownView } from "./TypingView";
 import { Entry, Processor, Watcher, ITypingState, WordsRequestClient, IDifficultyOption } from "./TypingModel";
 import { StartMenu, ResultMenu, DifficultySelectMenu } from './MenuView'
 import * as Rx from "rxjs"
@@ -8,6 +8,7 @@ import * as Rx from "rxjs"
 enum Scene {
     Start,
     SelectDifficulty,
+    CountDown,
     Game,
     Result
 };
@@ -15,6 +16,7 @@ enum Scene {
 interface TypingAppState {
     scene: Scene;
     typingState: ITypingState;
+    countdown: number;
 }
 
 class TypingApp extends React.Component<{}, TypingAppState> {
@@ -22,7 +24,8 @@ class TypingApp extends React.Component<{}, TypingAppState> {
         super(props);
         this.state = {
             scene: Scene.Start,
-            typingState: null
+            typingState: null,
+            countdown: Number.MAX_VALUE
         };
     }
 
@@ -53,6 +56,7 @@ class TypingApp extends React.Component<{}, TypingAppState> {
 
         /// bind keyboard events to typing game processor
         var keyStream = Rx.Observable.fromEvent<KeyboardEvent>(document, 'keydown')
+            .skipUntil(processor.StartAsObservable())
             .map(x => x.key)
             .subscribe(x => processor.Enter(x));
 
@@ -66,10 +70,20 @@ class TypingApp extends React.Component<{}, TypingAppState> {
             this.OnResult(watcher.State); /// when finish game, app transit to result scene.
         });
 
-        /// transit to game scene and initialize game state
-        this.setState({ scene: Scene.Game });
-        processor.Start();
-        this.OnGameStateChanged(watcher.State);
+        /// after count down, app transit to game scene and initialize game state
+        this.setState({ scene: Scene.CountDown, countdown: 3 });
+        Rx.Observable.interval(1000)
+            .map(x => 1) // to number type
+            .scan((acc, x) => acc - 1, 3) // calc next count
+            .takeWhile(x => 0 < x) // if 0, emit complete signal
+            .subscribe(
+            x => this.setState({ countdown: x }),
+            err => { },
+            () => { // On complete, start games
+                processor.Start();
+                this.setState({ scene: Scene.Game });
+                this.OnGameStateChanged(watcher.State);
+            });
     }
 
     private OnStartGameWithMissedTypedWords() {
@@ -95,6 +109,11 @@ class TypingApp extends React.Component<{}, TypingAppState> {
             case Scene.SelectDifficulty: return <DifficultySelectMenu
                 options={this.GetOptions()}
                 onSelect={(option) => this.OnSelectedDifficulty(option)} />
+
+
+            case Scene.CountDown: return <CountDownView
+                count={this.state.countdown}
+                finish={this.state.countdown == 0} />
 
 
             case Scene.Game: return <TypingView typingState={this.state.typingState} />;
