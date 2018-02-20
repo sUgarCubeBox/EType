@@ -15,6 +15,7 @@ enum Scene {
 
 interface TypingAppState {
     scene: Scene;
+    options: IDifficultyOption[];
     typingState: ITypingState;
     countdown: number;
 }
@@ -25,6 +26,7 @@ class TypingApp extends React.Component<{}, TypingAppState> {
         this.state = {
             scene: Scene.Start,
             typingState: null,
+            options: null,
             countdown: Number.MAX_VALUE
         };
     }
@@ -41,13 +43,15 @@ class TypingApp extends React.Component<{}, TypingAppState> {
         this.setState({ scene: Scene.SelectDifficulty });
     }
 
-    private GetOptions(): IDifficultyOption[] {
-        return new WordsRequestClient("/test").RequestOptions();
+    private GetOptions(): Promise<IDifficultyOption[]> {
+        return new WordsRequestClient("localhost:5000").RequestOptions();
     }
 
     private OnSelectedDifficulty(option: IDifficultyOption) {
-        var words = new WordsRequestClient("/test").RuquestWords(option.requestEndpoint);
-        this.OnStartGame(words);
+        new WordsRequestClient("localhost:5000").RuquestWords(option.id)
+            .then(words => {
+                this.OnStartGame(words);
+            });
     }
 
     private OnStartGame(words: Entry[]) {
@@ -107,7 +111,7 @@ class TypingApp extends React.Component<{}, TypingAppState> {
 
 
             case Scene.SelectDifficulty: return <DifficultySelectMenu
-                options={this.GetOptions()}
+                options={this.state.options}
                 onSelect={(option) => this.OnSelectedDifficulty(option)} />
 
 

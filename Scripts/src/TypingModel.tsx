@@ -348,57 +348,71 @@ export class TypingStateAggregater {
 }
 
 export interface IDifficultyOption {
+    readonly id: number;
     readonly name: string;
     readonly size: number;
     readonly averageLength: number;
     readonly discription: string;
-    readonly requestEndpoint: string;
 }
 
 class DifficultyOption implements IDifficultyOption {
+    public id: number;
     public name: string;
     public size: number; // size of the word set in this difficulty option
     public averageLength: number; // average length of letters of words in this difficulty option
     public discription: string;
-    public requestEndpoint: string;
 
-    constructor(name: string, size: number, averageLength: number, discription: string, endpoint: string) {
+    constructor(id: number, name: string, size: number, averageLength: number, discription: string) {
+        this.id = id;
         this.name = name;
         this.size = size;
         this.averageLength = averageLength;
         this.discription = discription;
-        this.requestEndpoint = endpoint;
     }
 }
 
 export class WordsRequestClient {
     private apihost: string;
+    private const headers: Headers = new Headers({
+        "Content-Type": "application/json",
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+    });
 
     constructor(apihost: string) {
         this.apihost = apihost;
     }
 
-    public RequestOptions(): IDifficultyOption[] {
+    public RequestOptions(): Promise<IDifficultyOption[]> {
         // test object
-        return [
-            new DifficultyOption("テストデータ", 7, 6, "テストのデータ", "/test"),
-            new DifficultyOption("テストデータ2", 7, 6, "テスト2のデータ", "/test"),
-        ];
+        return fetch(this.apihost + "/api", {
+            method: "get",
+            headers: this.headers
+        })
+            .then(res => res.json()
+                .then(data => {
+                    var array: IDifficultyOption[] = [];
+                    data.forEach((x: any) => {
+                        array.push(new DifficultyOption(x.id, x.name, x.size, x.average_length, x.discription))
+                    });
+                    return array
+                })
+            );
     }
 
-    public RuquestWords(endpoint: string): Entry[] {
-        // test words
-        switch (endpoint) {
-            case "/test": return [
-                new Entry("apple", "りんご"),
-                new Entry("programming", "プログラミング"),
-                new Entry("note", "メモ帳"),
-                new Entry("terminal", "端末"),
-                new Entry("extra", "余計な"),
-                new Entry("clock", "時計"),
-                new Entry("time", "時間")
-            ];
-            default: return [];
-        }
+    public RuquestWords(id: number): Promise<Entry[]> {
+        return fetch(this.apihost + "/api/words/" + id.toString(), {
+            method: "get",
+            headers: this.headers
+        })
+            .then(res => res.json()
+                .then(data => {
+                    var array: Entry[];
+                    data.forEach((x: any) => {
+                        array.push(new Entry(x.word, x.mean));
+                    })
+                    return array;
+                })
+        )
     }
 }
