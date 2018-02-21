@@ -21,6 +21,8 @@ interface TypingAppState {
 }
 
 class TypingApp extends React.Component<{}, TypingAppState> {
+    private readonly apiClient = new WordsRequestClient("http://localhost:5000");
+
     constructor(props: any) {
         super(props);
         this.state = {
@@ -40,15 +42,18 @@ class TypingApp extends React.Component<{}, TypingAppState> {
     }
 
     private OnSelectDifficulty() {
-        this.setState({ scene: Scene.SelectDifficulty });
+        this.apiClient.RequestOptions()
+            .then(options => {
+                this.setState({ scene: Scene.SelectDifficulty, options: options });
+            });
     }
 
     private GetOptions(): Promise<IDifficultyOption[]> {
-        return new WordsRequestClient("localhost:5000").RequestOptions();
+        return this.apiClient.RequestOptions();
     }
 
     private OnSelectedDifficulty(option: IDifficultyOption) {
-        new WordsRequestClient("localhost:5000").RuquestWords(option.id)
+        this.apiClient.RuquestWords(option.id)
             .then(words => {
                 this.OnStartGame(words);
             });

@@ -373,7 +373,7 @@ class DifficultyOption implements IDifficultyOption {
 
 export class WordsRequestClient {
     private apihost: string;
-    private const headers: Headers = new Headers({
+    private readonly headers: Headers = new Headers({
         "Content-Type": "application/json",
         'Accept': 'application/json',
         'X-Requested-With': 'XMLHttpRequest'
@@ -395,7 +395,7 @@ export class WordsRequestClient {
                     data.forEach((x: any) => {
                         array.push(new DifficultyOption(x.id, x.name, x.size, x.average_length, x.discription))
                     });
-                    return array
+                    return array;
                 })
             );
     }
@@ -403,16 +403,16 @@ export class WordsRequestClient {
     public RuquestWords(id: number): Promise<Entry[]> {
         return fetch(this.apihost + "/api/words/" + id.toString(), {
             method: "get",
-            headers: this.headers
+            headers: this.headers,
         })
             .then(res => res.json()
                 .then(data => {
-                    var array: Entry[];
+                    var array: Entry[] = [];
                     data.forEach((x: any) => {
                         array.push(new Entry(x.word, x.mean));
                     })
                     return array;
                 })
-        )
+            );
     }
 }
