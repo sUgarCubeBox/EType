@@ -43,9 +43,7 @@ class TypingApp extends React.Component<{}, TypingAppState> {
 
     private OnSelectDifficulty() {
         this.apiClient.RequestOptions()
-            .then(options => {
-                this.setState({ scene: Scene.SelectDifficulty, options: options });
-            });
+            .then(options => this.setState({ scene: Scene.SelectDifficulty, options: options }));
     }
 
     private GetOptions(): Promise<IDifficultyOption[]> {
@@ -54,9 +52,7 @@ class TypingApp extends React.Component<{}, TypingAppState> {
 
     private OnSelectedDifficulty(option: IDifficultyOption) {
         this.apiClient.RuquestWords(option.id)
-            .then(words => {
-                this.OnStartGame(words);
-            });
+            .then(words => this.OnStartGame(words));
     }
 
     private OnStartGame(words: Entry[]) {
@@ -64,8 +60,9 @@ class TypingApp extends React.Component<{}, TypingAppState> {
         var watcher = new Watcher(processor); // manager that observe state of the processor and aggregate it.
 
         /// bind keyboard events to typing game processor
-        var keyStream = Rx.Observable.fromEvent<KeyboardEvent>(document, 'keydown')
+        Rx.Observable.fromEvent<KeyboardEvent>(document, 'keydown')
             .skipUntil(processor.StartAsObservable())
+            .takeUntil(watcher.FinishAsObservable())
             .map(x => x.key)
             .subscribe(x => processor.Enter(x));
 
@@ -74,7 +71,6 @@ class TypingApp extends React.Component<{}, TypingAppState> {
 
         /// bind game finish events to result view
         watcher.FinishAsObservable().take(1).subscribe(_ => {
-            keyStream.unsubscribe();
             processor.Close();
             this.OnResult(watcher.State); /// when finish game, app transit to result scene.
         });
