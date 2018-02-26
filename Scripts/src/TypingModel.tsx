@@ -384,7 +384,6 @@ export class WordsRequestClient {
     }
 
     public RequestOptions(): Promise<IDifficultyOption[]> {
-        // test object
         return fetch(this.apihost + "/api", {
             method: "get",
             headers: this.headers
