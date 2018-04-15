@@ -1,6 +1,6 @@
 ﻿import * as React from 'react';
 import { Well, Panel, Grid, Row } from 'react-bootstrap';
-import { ITypingState } from './TypingModel'
+import { ITypingState } from './Model'
 
 export interface TypingViewProp {
     typingState: ITypingState;
@@ -67,6 +67,7 @@ export class CountDownView extends React.Component<CountDownViewProp> {
         return (
             <Grid>
                 <Row>
+                    <p>タイプ数 : - ミス数 : - 最高タイピング速度 : ???(type/s) </p>
                     <Panel>
                         <Panel.Body style={{ textAlign: "center" }}>
                             <p style={{ color: "orange" }}>{this.countString()}</p>

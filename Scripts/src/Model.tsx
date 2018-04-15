@@ -337,7 +337,7 @@ export class TypingStateAggregater {
             new Rank(550, "神タイパー")
         ];
 
-        var rank = "ゲスト";
+        var rank = "見習いタイパー";
         map.forEach(r => {
             if (r.score <= score)
                 rank = r.rank;
@@ -355,7 +355,7 @@ export interface IDifficultyOption {
     readonly discription: string;
 }
 
-class DifficultyOption implements IDifficultyOption {
+export class DifficultyOption implements IDifficultyOption {
     public id: number;
     public name: string;
     public size: number; // size of the word set in this difficulty option
@@ -413,5 +413,23 @@ export class WordsRequestClient {
                     return array;
                 })
             );
+    }
+}
+
+export class ArrayShuffler {
+    public static Shuffle<T>(array: Array<T>): Array<T> {
+        var copied = array.concat();
+        var dist: Array<T> = [];
+        while (copied.length != 0) {
+            var pickIndex = ArrayShuffler.GenerateRangedRandom(0, copied.length - 1);
+            var pickElem = copied[pickIndex];
+            copied.splice(pickIndex, 1);
+            dist.push(pickElem)
+        }
+        return dist;
+    }
+
+    private static GenerateRangedRandom(start: number, end: number) {
+        return Math.floor(Math.random() * end) + start;
     }
 }

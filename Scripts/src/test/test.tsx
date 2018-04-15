@@ -3,11 +3,11 @@
 // https://github.com/Microsoft/TypeScript/wiki/JSX
 
 import { Subscription } from 'rxjs/Rx';
-import { Processor, Watcher, Entry, TypingStateAggregater } from '../TypingModel';
+import { Processor, Watcher, Entry, TypingStateAggregater } from '../Model';
 import { expect, assert } from 'chai';
 import 'mocha';
 
-/// check a behaviour of the processor on each state.
+/// check behaviours of the processor on each state.
 describe('processor', () => {
     var words: Entry[] = [ // test words
         new Entry("apple", "りんご"),

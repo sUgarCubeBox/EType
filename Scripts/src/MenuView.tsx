@@ -4,7 +4,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Button, Well, Grid, Col, Row, Panel, PanelBody } from 'react-bootstrap';
-import { ITypingState, Entry, TypingStateAggregater, IDifficultyOption } from './TypingModel';
+import { ITypingState, Entry, TypingStateAggregater, IDifficultyOption } from './Model';
 
 interface StartMenuProp {
     onstart: () => void; // スタートボタンが押された時に呼ばれる
@@ -127,16 +127,18 @@ export class DifficultySelectMenu extends React.Component<DifficultySelectViewPr
 
     render() {
         var options = this.props.options.map((o, i) =>
-            <Panel key={i}>
+            <Col xs={4} key={i}>
                 <DifficultyOptionView info={o} onClick={(option: IDifficultyOption) => this.handleSelect(option)} />
-            </Panel>);
+            </Col>);
 
         return (<Grid>
             <Row>
                 <h1>難易度セレクト</h1>
-                <p>プレイ難易度を選択してください。</p>
+                <p>プレイ難易度を選択してください。パネルをクリックするとゲームがスタートします。</p>
             </Row>
-            {options}
+            <Row>
+                {options}
+            </Row>
         </Grid>);
     }
 }
@@ -153,12 +155,12 @@ class DifficultyOptionView extends React.Component<DifficultyOptionViewProp, {}>
 
     render() {
         return (
-            <div onClick={() => this.handleSelect()}>
+            <Button onClick={() => this.handleSelect()}>
                 <h2>{this.props.info.name}</h2>
                 <p>ワード数 : {this.props.info.size} 平均文字数 : {this.props.info.averageLength}</p>
                 <hr />
                 <p>{this.props.info.discription}</p>
-            </div>
+            </Button>
         );
     }
 }

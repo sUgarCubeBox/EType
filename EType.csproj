@@ -80,12 +80,13 @@
     <Folder Include="Scripts\dist\" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="Scripts\src\DefaultDifficulties.tsx" />
     <TypeScriptCompile Include="Scripts\src\MenuView.tsx" />
-    <TypeScriptCompile Include="Scripts\src\index.tsx" />
+    <TypeScriptCompile Include="Scripts\src\App.tsx" />
     <TypeScriptCompile Include="Scripts\src\SpanWindow.tsx" />
     <TypeScriptCompile Include="Scripts\src\test\test.tsx" />
-    <TypeScriptCompile Include="Scripts\src\TypingView.tsx" />
-    <TypeScriptCompile Include="Scripts\src\TypingModel.tsx" />
+    <TypeScriptCompile Include="Scripts\src\GameView.tsx" />
+    <TypeScriptCompile Include="Scripts\src\Model.tsx" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

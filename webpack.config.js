@@ -1,6 +1,6 @@
 ﻿var path = require('path');
 module.exports = {
-    entry: "./Scripts/src/index.tsx",
+    entry: "./Scripts/src/App.tsx",
     output: {
         filename: "./Scripts/dist/bundle.js",
     },

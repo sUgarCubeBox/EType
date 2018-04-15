@@ -1,9 +1,10 @@
 ﻿import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { TypingView, TypingViewProp, CountDownView } from "./TypingView";
-import { Entry, Processor, Watcher, ITypingState, WordsRequestClient, IDifficultyOption } from "./TypingModel";
+import { TypingView, TypingViewProp, CountDownView } from "./GameView";
+import { Entry, Processor, Watcher, ITypingState, WordsRequestClient, IDifficultyOption, ArrayShuffler } from "./Model";
 import { StartMenu, ResultMenu, DifficultySelectMenu } from './MenuView'
 import * as Rx from "rxjs"
+import { defaultOptions, defaultEntries } from "./DefaultDifficulties"
 
 enum Scene {
     Start,
@@ -21,7 +22,7 @@ interface TypingAppState {
 }
 
 class TypingApp extends React.Component<{}, TypingAppState> {
-    private readonly apiClient = new WordsRequestClient("http://localhost:5000");
+    private readonly apiClient = new WordsRequestClient("http://127.0.0.1:5000");
 
     constructor(props: any) {
         super(props);
@@ -43,16 +44,18 @@ class TypingApp extends React.Component<{}, TypingAppState> {
 
     private OnSelectDifficulty() {
         this.apiClient.RequestOptions()
-            .then(options => this.setState({ scene: Scene.SelectDifficulty, options: options }));
-    }
-
-    private GetOptions(): Promise<IDifficultyOption[]> {
-        return this.apiClient.RequestOptions();
+            .then(options => this.setState({ scene: Scene.SelectDifficulty, options: options.concat(defaultOptions) }))
+            .catch(x => this.setState({ scene: Scene.SelectDifficulty, options: defaultOptions})); // when request is rejected, app uses defaultOptions.
     }
 
     private OnSelectedDifficulty(option: IDifficultyOption) {
-        this.apiClient.RuquestWords(option.id)
-            .then(words => this.OnStartGame(words));
+        if (0 <= option.id) {
+            this.apiClient.RuquestWords(option.id)
+                .then(words => this.OnStartGame(words));
+        }
+        else {
+            this.OnStartGame(ArrayShuffler.Shuffle(defaultEntries[-option.id - 1])); // when option.id is negative, app uses defaultEntries.
+        }
     }
 
     private OnStartGame(words: Entry[]) {
@@ -75,7 +78,7 @@ class TypingApp extends React.Component<{}, TypingAppState> {
             this.OnResult(watcher.State); /// when finish game, app transit to result scene.
         });
 
-        /// after count down, app transit to game scene and initialize game state
+        /// after count down, app transits to game scene and initialize game state
         this.setState({ scene: Scene.CountDown, countdown: 3 });
         Rx.Observable.interval(1000)
             .map(x => 1) // to number type
