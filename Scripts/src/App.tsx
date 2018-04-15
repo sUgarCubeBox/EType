@@ -22,7 +22,7 @@ interface TypingAppState {
 }
 
 class TypingApp extends React.Component<{}, TypingAppState> {
-    private readonly apiClient = new WordsRequestClient("http://127.0.0.1:5000");
+    private readonly apiClient = new WordsRequestClient("https://calc.mie.jp/etype");
 
     constructor(props: any) {
         super(props);
@@ -54,7 +54,7 @@ class TypingApp extends React.Component<{}, TypingAppState> {
                 .then(words => this.OnStartGame(words));
         }
         else {
-            this.OnStartGame(ArrayShuffler.Shuffle(defaultEntries[-option.id - 1])); // when option.id is negative, app uses defaultEntries.
+            this.OnStartGame(ArrayShuffler.Shuffle(defaultEntries[-option.id - 1]).splice(0, option.size)); // when option.id is negative, app uses defaultEntries.
         }
     }
 

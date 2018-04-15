@@ -155,7 +155,7 @@ class DifficultyOptionView extends React.Component<DifficultyOptionViewProp, {}>
 
     render() {
         return (
-            <Button onClick={() => this.handleSelect()}>
+            <Button style={{ width: "100%" }} onClick={() => this.handleSelect()}>
                 <h2>{this.props.info.name}</h2>
                 <p>ワード数 : {this.props.info.size} 平均文字数 : {this.props.info.averageLength}</p>
                 <hr />
