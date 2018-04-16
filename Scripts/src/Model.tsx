@@ -12,7 +12,6 @@ export class Processor {
     private cursor: number;
     private isStarted: boolean;
 
-    // subjects
     private missTypeSubject = new Subject<{}>();
     private correctTypeSubject = new Subject<{}>();
     private nextWordSubject = new Subject<{}>();
@@ -51,10 +50,10 @@ export class Processor {
         this.correctTypeSubject,
         this.nextWordSubject,
         this.startSubject,
-        this.skipSubject].forEach(x => x.complete()); // dispose observation
+        this.skipSubject].forEach(x => x.complete()); // ぶら下がってる購読者を全部切り離す
     }
 
-    /// return true when typed letter is correct.
+    /// タイプした文字があってたらtrueを返す。
     public Enter(letter: string): boolean {
         if (!this.isStarted)
             return false;
@@ -216,14 +215,14 @@ export class Watcher {
     }
 
     private BindMaxSpeedCalculation(p: Processor, state: TypingState) {
-        // calc max speed
+        // 最大瞬間タイピング速度の計算
         p.CorrectAsObservable()
             .map(x => Date.now())
-            .map(x => [x]) // type convert because "scan" should be typed as "(x : [], prev : []) => []"
+            .map(x => [x]) // scanを使うために型を変換
             .scan((prevPair, diagonalPair) => [prevPair[1], diagonalPair[0]], [0, 0])
-            .map(x => x[1] - x[0]) // time between keydowns
-            .spanWindow<number>(5) // buffering events by sliding window
-            .map(x => x.reduce((s, x) => s + x) / x.length) // window average
+            .map(x => x[1] - x[0]) // 次のキータイプまでの時間を算出
+            .spanWindow<number>(5) // 窓でバッファリング
+            .map(x => x.reduce((s, x) => s + x) / x.length) // 窓内の平均
             .scan((min, x) => x < min ? x : min, Number.MAX_VALUE)
             .distinctUntilChanged()
             .subscribe(x => state.maxSpeed = 1000 / x);
@@ -237,7 +236,7 @@ export class Watcher {
 
         p.MissAsObservable()
             .map(x => [p.Cursor, p.WordIndex])
-            .subscribe(x => state.missTypedMap[x[1]][x[0]] += 1); // record misstyped position
+            .subscribe(x => state.missTypedMap[x[1]][x[0]] += 1); // ミスした位置を記録
     }
 }
 
@@ -272,7 +271,7 @@ class TypingState implements ITypingState {
         this.words = words;
         this.words.map(x => x.Word).forEach((x, i) => {
             var t = new Array<number>(x.length);
-            for (var j = 0; j < x.length; j++) // init 2 dims array with 0.
+            for (var j = 0; j < x.length; j++) // 2次元配列を0で初期化
                 t[j] = 0;
             this.missTypedMap[i] = t;
         });
@@ -358,8 +357,8 @@ export interface IDifficultyOption {
 export class DifficultyOption implements IDifficultyOption {
     public id: number;
     public name: string;
-    public size: number; // size of the word set in this difficulty option
-    public averageLength: number; // average length of letters of words in this difficulty option
+    public size: number; // 単語数
+    public averageLength: number; // 平均文字数
     public discription: string;
 
     constructor(id: number, name: string, size: number, averageLength: number, discription: string) {

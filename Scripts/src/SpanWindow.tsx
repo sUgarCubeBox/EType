@@ -5,6 +5,8 @@ import { Observable } from "rxjs/Observable";
 import { Observer } from "rxjs/Rx";
 import { Queue } from "typescript-collections";
 
+// イベントを窓でバッファリングする。
+// buffer()とは違って、窓が一イベントごとにスライドする。
 Observable.prototype.spanWindow = function <T>(size: number) {
     return new Observable((observer : Observer<T[]>) => {
         var windowQueue = new Queue<T>();

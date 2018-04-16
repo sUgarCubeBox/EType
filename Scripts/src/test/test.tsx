@@ -7,7 +7,7 @@ import { Processor, Watcher, Entry, TypingStateAggregater } from '../Model';
 import { expect, assert } from 'chai';
 import 'mocha';
 
-/// check behaviours of the processor on each state.
+/// processorの動作チェック
 describe('processor', () => {
     var words: Entry[] = [ // test words
         new Entry("apple", "りんご"),
