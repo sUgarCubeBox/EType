@@ -6,8 +6,8 @@ import { Entry, DifficultyOption } from './Model'
 
 export var defaultOptions: Array<DifficultyOption> = [
     new DifficultyOption(-1, "練習用", 6, 4, "練習用難度。操作などを確かめるために使ってね。"),
-    new DifficultyOption(-2, "ノーマル", 20, 10, "普通の難易度です。"),
-    new DifficultyOption(-2, "ハード", 20, 10, "難しめの難易度です。")
+    new DifficultyOption(-2, "ノーマル", 20, 8.3, "普通の難易度です。"),
+    new DifficultyOption(-3, "ハード", 20, 8.7, "難しめの難易度です。")
 ]
 
 export var defaultEntries: Array<Array<Entry>> = [
