@@ -219,7 +219,7 @@ export class Watcher {
         // calc max speed
         p.CorrectAsObservable()
             .map(x => Date.now())
-            .map(x => [x, x]) // diagonal map
+            .map(x => [x]) // type convert because "scan" should be typed as "(x : [], prev : []) => []"
             .scan((prevPair, diagonalPair) => [prevPair[1], diagonalPair[0]], [0, 0])
             .map(x => x[1] - x[0]) // time between keydowns
             .spanWindow<number>(5) // buffering events by sliding window
