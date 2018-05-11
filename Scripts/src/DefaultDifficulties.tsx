@@ -7,7 +7,7 @@ import { Entry, DifficultyOption } from './Model'
 export var defaultOptions: Array<DifficultyOption> = [
     new DifficultyOption(-1, "練習用", 6, 4, "練習用難度。操作などを確かめるために使ってね。"),
     new DifficultyOption(-2, "normal", 20, 8.3, "普通の難易度です。"),
-    new DifficultyOption(-3, "hard", 20, 8.3, "難しめの難易度です。")
+    new DifficultyOption(-3, "hard", 20, 8.3, "難しめの難易度です。"),
     new DifficultyOption(-4, "insane", 20, 8.7, "プロの難易度です。")
 ]
 
@@ -220,7 +220,7 @@ export var defaultEntries: Array<Array<Entry>> = [
         new Entry("up-to-date", "最新の"),
         new Entry("wage", "賃金"),
         new Entry("wheel", "車輪"),
-        new Entry("width", "幅"),
+        new Entry("width", "幅")
     ],
     [
         new Entry("abandon", "捨て去る"),
