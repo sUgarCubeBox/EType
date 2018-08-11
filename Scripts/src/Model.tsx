@@ -12,7 +12,6 @@ export class Processor {
     private cursor: number;
     private isStarted: boolean;
 
-    // subjects
     private missTypeSubject = new Subject<{}>();
     private correctTypeSubject = new Subject<{}>();
     private nextWordSubject = new Subject<{}>();
@@ -51,7 +50,7 @@ export class Processor {
         this.correctTypeSubject,
         this.nextWordSubject,
         this.startSubject,
-        this.skipSubject].forEach(x => x.complete()); // dispose observation
+        this.skipSubject].forEach(x => x.complete()); 
     }
 
     /// return true when typed letter is correct.
@@ -219,10 +218,10 @@ export class Watcher {
         // calc max speed
         p.CorrectAsObservable()
             .map(x => Date.now())
-            .map(x => [x, x]) // diagonal map
+            .map(x => [x, x]) 
             .scan((prevPair, diagonalPair) => [prevPair[1], diagonalPair[0]], [0, 0])
-            .map(x => x[1] - x[0]) // time between keydowns
-            .spanWindow<number>(5) // buffering events by sliding window
+            .map(x => x[1] - x[0]) 
+            .spanWindow<number>(5) 
             .map(x => x.reduce((s, x) => s + x) / x.length) // window average
             .scan((min, x) => x < min ? x : min, Number.MAX_VALUE)
             .distinctUntilChanged()
