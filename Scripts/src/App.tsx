@@ -43,9 +43,10 @@ class TypingApp extends React.Component<{}, TypingAppState> {
     }
 
     private OnSelectDifficulty() {
-        this.apiClient.RequestOptions()
-            .then(options => this.setState({ scene: Scene.SelectDifficulty, options: options.concat(defaultOptions) }))
-            .catch(x => this.setState({ scene: Scene.SelectDifficulty, options: defaultOptions})); // when request is rejected, app uses defaultOptions.
+        // this.apiClient.RequestOptions()
+        //     .then(options => this.setState({ scene: Scene.SelectDifficulty, options: options.concat(defaultOptions) }))
+        //     .catch(x => this.setState({ scene: Scene.SelectDifficulty, options: defaultOptions})); // when request is rejected, app uses defaultOptions.
+        this.setState({ scene: Scene.SelectDifficulty, options: defaultOptions});
     }
 
     private OnSelectedDifficulty(option: IDifficultyOption) {
