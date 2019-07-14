@@ -3,21 +3,20 @@
 // https://github.com/Microsoft/TypeScript/wiki/JSX
 
 import './SpanWindow';
-import { Queue } from 'typescript-collections';
 import { Observable, Subject } from 'rxjs/Rx';
 
 export class Processor {
-    private words: Array<Entry>;
-    private wordIndex: number;
-    private cursor: number;
-    private isStarted: boolean;
+    protected words: Array<Entry>;
+    protected wordIndex: number;
+    protected cursor: number;
+    protected isStarted: boolean;
 
-    private missTypeSubject = new Subject<{}>();
-    private correctTypeSubject = new Subject<{}>();
-    private nextWordSubject = new Subject<{}>();
-    private finishSubject = new Subject<{}>();
-    private startSubject = new Subject<{}>();
-    private skipSubject = new Subject<{}>();
+    protected missTypeSubject = new Subject<{}>();
+    protected correctTypeSubject = new Subject<{}>();
+    protected nextWordSubject = new Subject<{}>();
+    protected finishSubject = new Subject<{}>();
+    protected startSubject = new Subject<{}>();
+    protected skipSubject = new Subject<{}>();
 
     public MissAsObservable(): Observable<{}> { return this.missTypeSubject; }
     public CorrectAsObservable(): Observable<{}> { return this.correctTypeSubject; }
@@ -45,7 +44,7 @@ export class Processor {
         this.finishSubject.complete();
     }
 
-    private OnFinish() {
+    protected OnFinish() {
         [this.missTypeSubject,
         this.correctTypeSubject,
         this.nextWordSubject,
@@ -78,7 +77,7 @@ export class Processor {
         this.NextWord();
     }
 
-    private NextWord() {
+    protected NextWord() {
         if (this.IsFinished) {
             this.finishSubject.next({});
             return;
@@ -88,19 +87,19 @@ export class Processor {
         this.nextWordSubject.next({});
     }
 
-    private get IsEntered(): boolean {
+    protected get IsEntered(): boolean {
         return this.CurrentWord.length <= this.cursor;
     }
 
-    private get IsFinished(): boolean {
+    protected get IsFinished(): boolean {
         return this.words.length - 1 === this.wordIndex && this.IsEntered;
     }
 
-    private get CurrentWord(): string {
+    protected get CurrentWord(): string {
         return this.NowTypingEntry.Word;
     }
 
-    private get CurrentLetter(): string {
+    protected get CurrentLetter(): string {
         return this.CurrentWord.charAt(this.cursor);
     }
 
@@ -168,8 +167,8 @@ export interface ITypingState {
 }
 
 export class Watcher {
-    private processor: Processor;
-    private state: TypingState;
+    protected processor: Processor;
+    protected state: TypingState;
 
     private finishSubject = new Subject<{}>();
 
@@ -190,14 +189,18 @@ export class Watcher {
 
     constructor(processor: Processor) {
         this.processor = processor;
-        var state = new TypingState(
+        var state = this.CreateState(processor);
+        this.state = state;
+        this.Bind(this.processor, this.state);
+    }
+
+    protected CreateState(processor: Processor): TypingState {
+        return new TypingState(
             this.processor.Words,
             () => this.processor.Left,
             () => this.processor.Typed,
             () => this.processor.NowTypingEntry.Mean
         );
-        this.state = state;
-        this.Bind(this.processor, this.state);
     }
 
     private Bind(p: Processor, state: TypingState) {
@@ -240,7 +243,7 @@ export class Watcher {
     }
 }
 
-class TypingState implements ITypingState {
+export class TypingState implements ITypingState {
     missCount: number = 0;
     correctCount: number = 0;
     timeOverCount: number = 0;

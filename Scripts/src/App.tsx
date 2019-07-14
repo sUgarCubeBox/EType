@@ -67,6 +67,7 @@ class TypingApp extends React.Component<{}, TypingAppState> {
         Rx.Observable.fromEvent<KeyboardEvent>(document, 'keydown')
             .skipUntil(processor.StartAsObservable())
             .takeUntil(watcher.FinishAsObservable())
+            .do(x => console.log(x))
             .map(x => x.key)
             .subscribe(x => processor.Enter(x));
 
