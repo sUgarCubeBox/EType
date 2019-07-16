@@ -29,7 +29,7 @@ interface WordViewProp {
     left: string;
 }
 
-class WordView extends React.Component<WordViewProp, {}> {
+export class WordView extends React.Component<WordViewProp, {}> {
     render() {
         return (
             <div>
